@@ -1,5 +1,6 @@
 # SystemLevelSimulationLogging
-Utilize the Events mechanism available in System Level Simulation (SLS) capabilities in **Mathworks Bluetooth(R) Toolbox, WLAN Toolbox**
+Utilize the Events mechanism available in System Level Simulation (SLS) capabilities in **Mathworks Bluetooth(R) Toolbox, WLAN Toolbox and 
+Communications Toolbox Wireless Network Simulation Library Support Package**
 
 In addition to normal system level simulations performed using Bluetooth Toolbox or WLAN Toolbox using the node features, this setup will help to log the internal events happening during the simulations and be able to view them at the end of the simulation.
 
