@@ -1,3 +1,5 @@
+%   Copyright 2023 The MathWorks, Inc.
+
 % Check if the 'Communications Toolbox (TM) Wireless Network Simulation
 % Library' support package is installed. If the support package is not
 % installed, MATLAB(R) returns an error with a link to download and

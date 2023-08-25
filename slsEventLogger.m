@@ -1,4 +1,5 @@
 classdef slsEventLogger < matlab.apps.AppBase
+    %   Copyright 2023 The MathWorks, Inc.
 
     % Properties that correspond to app components
     properties (Access = public)
