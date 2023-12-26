@@ -2,13 +2,18 @@ classdef eventLogger < handle
     %   Copyright 2023 The MathWorks, Inc.
 
     properties
+        Nodes
+        DisplayEventLogs=true
+
+        % Logged nodes properties
         bluetoothNode
         bluetoothLENode
         wlanNode
     end
 
     methods
-        function obj=eventLogger()
+        function obj=eventLogger(nodes, simulationTime, varargin)
+            % Properties initialization
             availableNodeTypes={'bluetoothNode', 'bluetoothLENode', 'wlanNode'};
             for nodeTypeID=1:numel(availableNodeTypes)
                 currentNodeClass = availableNodeTypes{nodeTypeID};
@@ -18,6 +23,36 @@ classdef eventLogger < handle
                 for idx=1:numel(eventList)
                     obj.(currentNodeClass).(eventList{idx})={};
                 end
+            end
+
+            if iscell(nodes)
+                nodes=cellfun(@(x) x,nodes,UniformOutput=false);
+            else
+                nodes=arrayfun(@(x) x,nodes,UniformOutput=false);
+            end
+            obj.Nodes=nodes;
+            for idx=1:numel(obj.Nodes)
+                currNode = obj.Nodes{idx};
+                metaData = eval(['?' class(currNode)]);
+                eventList = arrayfun(@(x) string(x.Name), [metaData.EventList]);
+                eventList = setdiff(eventList, "ObjectBeingDestroyed");
+                for jdx=1:numel(eventList)
+                    addlistener(currNode, eventList(jdx), @(varargin)obj.appendEventLogs(varargin{:}));
+                end
+            end
+
+            if nargin==4 && strcmpi(varargin{1},"DisplayEventLogs") && varargin{2}
+                netsim=wirelessNetworkSimulator.getInstance();
+                netsim.scheduleAction(@(x,y) obj.showEventLogs(), [], simulationTime);
+            end
+        end
+
+        function showEventLogs(obj)
+            nodes = obj.Nodes;
+            nodeTypes = unique(cellfun(@(x) string(class(x)), nodes));
+            for idx = 1:numel(nodeTypes)
+                logs = obj.(nodeTypes(idx));
+                slsEventLogger(logs, nodeTypes(idx));
             end
         end
 
@@ -152,9 +187,14 @@ classdef eventLogger < handle
                                 'DeviceID', 'Frequency', 'MPDU'});
 
                         case 'MPDUDecoded'
-                            tmpTable = table(eventData.Data.CurrentTime, eventData.Source.Name, ...
-                                eventData.Data.DeviceID, eventData.Data.Frequency, string(num2str(eventData.Data.FCSFail)), ...
-                                string(eventData.Data.MPDU.FrameType),string(eventData.Data.MPDU .FrameFormat), eventData.Data.MPDU.Duration, string(eventData.Data.MPDU.AckPolicy), ...
+                            tmpTable = table( ...
+                                eventData.Data.CurrentTime, eventData.Source.Name, ...
+                                eventData.Data.DeviceID, eventData.Data.Frequency, ...
+                                string(num2str(eventData.Data.FCSFail')), ...
+                                string(eventData.Data.MPDU.FrameType), ...
+                                string(eventData.Data.MPDU .FrameFormat), ...
+                                eventData.Data.MPDU.Duration, ...
+                                string(eventData.Data.MPDU.AckPolicy), ...
                                 'VariableNames', {'Timestamp', 'Source', ...
                                 'DeviceID', 'Frequency', 'FCSFail', ...
                                 'FrameType', 'FrameFormat', 'Duration', 'AckPolicy'});
@@ -162,8 +202,12 @@ classdef eventLogger < handle
                         case 'TransmissionStatus'
                             tmpTable = table(eventData.Data.CurrentTime, eventData.Source.Name, ...
                                 eventData.Data.DeviceID, string(eventData.Data.FrameType), ...
-                                eventData.Data.ReceiverNodeID, string(num2str(eventData.Data.MPDUSuccess)), string(num2str(eventData.Data.MPDUDiscarded)), ...
-                                string(num2str(eventData.Data.TimeInQueue)), string(num2str(eventData.Data.AccessCategory)), eventData.Data.ResponseRSSI, ...
+                                eventData.Data.ReceiverNodeID, ...
+                                string(num2str(eventData.Data.MPDUSuccess')), ...
+                                string(num2str(eventData.Data.MPDUDiscarded')), ...
+                                string(num2str(eventData.Data.TimeInQueue')), ...
+                                string(num2str(eventData.Data.AccessCategory')), ...
+                                eventData.Data.ResponseRSSI, ...
                                 'VariableNames', {'Timestamp', 'Source', ...
                                 'DeviceID', 'FrameType', 'ReceiverNodeID', 'MPDUSuccess', 'MPDUDiscarded', 'TimeInQueue', ...
                                 'AccessCategory', 'ResponseRSSI'});

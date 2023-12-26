@@ -6,7 +6,7 @@
 % install the support package.
 wirelessnetworkSupportPackageCheck;
 
-networkSimulator = wirelessNetworkSimulator.init(EnableEventsLogger=true, DisplayEventLogs=true);
+networkSimulator = wirelessNetworkSimulator.init();
 
 % Create two Bluetooth BR/EDR nodes, specifying the role as "central"
 % and "peripheral", respectively
@@ -39,8 +39,12 @@ addTrafficSource(peripheralNode2,traffic,DestinationNode=centralNode);
 % Add the nodes to the simulator
 addNodes(networkSimulator,[centralNode peripheralNode1 peripheralNode2]);
 
+% Create and add logger
+simulationTime=80e-3 * 10;
+newEventLogger=eventLogger(networkSimulator.Nodes, simulationTime, DisplayEventLogs=true);
+
 % Set the simulation time in seconds and run the simulation
-run(networkSimulator,80e-3 * 10);
+run(networkSimulator,simulationTime);
 
 % Retrieve statistics corresponding to the Central and Peripheral nodes
 centralStats = statistics(centralNode);

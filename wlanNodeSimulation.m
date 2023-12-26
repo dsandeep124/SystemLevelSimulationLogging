@@ -7,7 +7,8 @@
 wirelessnetworkSupportPackageCheck;
 
 % Initialize wireless network simulator
-networksimulator = wirelessNetworkSimulator.init(EnableEventsLogger=true, DisplayEventLogs=true);
+simulationTime=1;
+networksimulator = wirelessNetworkSimulator.init();
 
 % Create a WLAN node with AP device configuration
 apDeviceCfg = wlanDeviceConfig(Mode="AP");
@@ -21,10 +22,14 @@ staNode = wlanNode(Name="STA",DeviceConfig=staDeviceCfg);
 associateStations(apNode,staNode,FullBufferTraffic="DL");
 
 % Add nodes to the simulation
-addNodes(networksimulator,[apNode,staNode]);
+nodes=[apNode,staNode];
+addNodes(networksimulator,nodes);
 
-% Run simulation for 1 second
-run(networksimulator,1);
+% Create and add logger
+newEventLogger=eventLogger(nodes, simulationTime, DisplayEventLogs=true);
+
+% Run simulation for simulationTime seconds
+run(networksimulator,simulationTime);
 
 % Retrieve and display statistics of AP and STA
 apStats = statistics(apNode);
