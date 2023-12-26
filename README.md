@@ -14,6 +14,4 @@ Some snippets using the sample scripts attached in the repo.
 # WLAN SLS Events Log using sample script:
 ![SLS Events Log](EventsLog_3.png?raw=true "SLS Events Log")
 
-In order to simplify things, the main feature used for this SLS, 
-**wirelessNetworkSimulator (from R2023b) has been updated a little bit for flexibility and shared here as a p-coded file which I guess will be under "MathWorks Limited License"**
-**Rest of the files in the repo are under "BSD License" as part of Mathworks File Exchange guidelines.**
+Under "BSD License" as part of Mathworks File Exchange guidelines.**
